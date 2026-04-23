@@ -1,0 +1,87 @@
+services:
+  attacker:
+    image: python:3.12-alpine
+    container_name: attacker
+    environment:
+      - PS1=\e[1;32m[Attacker]\e[0m \$ 
+    volumes:
+      - ./chisel:/chisel
+      - ./proxychains.conf:/etc/proxychains/proxychains.conf
+    command: >
+      sh -c "apk add --no-cache iproute2 curl nmap proxychains-ng bash && 
+      echo '<h1>Welcome to Attacker</h1>' > index.html && 
+      python3 -m http.server 3000 & 
+      sleep infinity"
+    networks:
+      net_external:
+        ipv4_address: 172.28.0.5
+
+  pivot1:
+    image: python:3.12-alpine
+    container_name: pivot1
+    environment:
+      - PS1=\e[1;34m[Pivot-1]\e[0m \$ 
+    volumes:
+      - ./chisel:/chisel
+    command: >
+      /bin/sh -c "echo '<h1>Welcome to Pivot 1</h1>' > index.html && 
+      python3 -m http.server 1111"
+    networks:
+      net_external:
+        ipv4_address: 172.28.0.10
+      net_alpha:
+        ipv4_address: 10.10.10.10
+
+  pivot2:
+    image: python:3.12-alpine
+    container_name: pivot2
+    environment:
+      - PS1=\e[1;36m[Pivot-2]\e[0m \$ 
+    volumes:
+      - ./chisel:/chisel
+    command: >
+      /bin/sh -c "echo '<h1>Welcome to Pivot 2</h1>' > index.html && 
+      python3 -m http.server 2222"
+    networks:
+      net_alpha:
+        ipv4_address: 10.10.10.20
+      net_beta:
+        ipv4_address: 10.10.20.10
+
+  pivot3:
+    image: python:3.12-alpine
+    container_name: pivot3
+    environment:
+      - PS1=\e[1;31m[Pivot-3/TARGET]\e[0m \$ 
+    volumes:
+      - ./chisel:/chisel
+    command: >
+      /bin/sh -c "echo '<h1>Welcome to Pivot 3</h1>' > index.html && 
+      python3 -m http.server 3333"
+    networks:
+      net_beta:
+        ipv4_address: 10.10.20.20
+      net_gamma:
+        ipv4_address: 10.10.30.10
+
+networks:
+  net_external:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+  net_alpha:
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+  net_beta:
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.10.20.0/24
+  net_gamma:
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.10.30.0/24
