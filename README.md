@@ -18,6 +18,48 @@
 ## Setup
 wget https://github.com/jpillora/chisel/releases/download/v1.11.5/chisel_1.11.5_linux_amd64.gz -O chisel.gz && gzip -d chisel.gz
 
+```mermaid
+%%{init: {'themeVariables': { 'primaryTextColor': '#000', 'secondaryTextColor': '#000', 'tertiaryTextColor': '#000' }}}%%
+graph LR
+    subgraph H_A ["Attacker"]
+        A_I1["<b>Iface 1</b><br/>172.28.0.5"]
+    end
+
+    subgraph H_P1 ["Pivot 1 (Port 1111)"]
+        P1_I1["<b>Iface 1</b><br/>172.28.0.10"]
+        P1_I2["<b>Iface 2</b><br/>10.10.10.10"]
+        P1_I1 <--> P1_I2
+    end
+
+    subgraph H_P2 ["Pivot 2 (Port 2222)"]
+        P2_I1["<b>Iface 1</b><br/>10.10.10.20"]
+        P2_I2["<b>Iface 2</b><br/>10.10.20.10"]
+        P2_I1 <--> P2_I2
+    end
+
+    subgraph H_P3 ["Pivot 3 (Port 3333)"]
+        P3_I1["<b>Iface 1</b><br/>10.10.20.20"]
+        P3_I2["<b>Iface 2</b><br/>10.10.30.10"]
+        P3_I1 <--> P3_I2
+    end
+
+    A_I1 == "172.28.0.0/24" ==> P1_I1
+    P1_I2 == "10.10.10.0/24" ==> P2_I1
+    P2_I2 == "10.10.20.0/24" ==> P3_I1
+
+    %% Colors for connected interfaces (sharing same color per network)
+    style A_I1 fill:#f96,stroke:#333,color:#000
+    style P1_I1 fill:#f96,stroke:#333,color:#000
+    
+    style P1_I2 fill:#bbf,stroke:#333,color:#000
+    style P2_I1 fill:#bbf,stroke:#333,color:#000
+    
+    style P2_I2 fill:#dfd,stroke:#333,color:#000
+    style P3_I1 fill:#dfd,stroke:#333,color:#000
+    
+    style P3_I2 fill:#fdd,stroke:#333,color:#000
+```
+
 | Host | Iface | IP Address |
 |---|---|---| 
 | Attacker | Iface 1 | 172.28.0.5 |
