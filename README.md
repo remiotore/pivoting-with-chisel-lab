@@ -68,11 +68,11 @@ In this scenario, we pivot through **Pivot 1** to reach the `10.10.10.0/24` netw
 %%{init: {'themeVariables': { 'primaryTextColor': '#000', 'secondaryTextColor': '#000', 'tertiaryTextColor': '#000' }}}%%
 graph LR
     subgraph "External Network (172.28.0.0/24)"
-        A["<b>Attacker</b><br/>172.28.0.5<br/><hr/><i>Chisel Server :10000</i>"]
+        A["<b>Attacker</b><br/>172.28.0.5<br/><hr/><code>chisel server -p 10000 --reverse</code>"]
     end
 
     subgraph "Internal Network A (10.10.10.0/24)"
-        P1["<b>Pivot 1</b><br/>Iface 1: 172.28.0.10<br/>Iface 2: 10.10.10.10"]
+        P1["<b>Pivot 1</b><br/>172.28.0.10 / 10.10.10.10<br/><hr/><code>chisel client 172.28.0.5:10000 R:socks</code>"]
     end
 
     A <== "<b>Tunnel 1</b><br/>R:socks" ==> P1
@@ -107,15 +107,15 @@ In this scenario, we pivot through **Pivot 1** and **Pivot 2** to reach the `10.
 %%{init: {'themeVariables': { 'primaryTextColor': '#000', 'secondaryTextColor': '#000', 'tertiaryTextColor': '#000' }}}%%
 graph LR
     subgraph "External Network (172.28.0.0/24)"
-        A["<b>Attacker</b><br/>172.28.0.5<br/><hr/><i>Chisel Server :10000</i><br/><i>Chisel Client (to P2)</i>"]
+        A["<b>Attacker</b><br/>172.28.0.5<br/><hr/><code>chisel server -p 10000 --reverse</code><br/><code>chisel client --proxy socks://127.0.0.1:1080 10.10.10.20:10001 1081:socks</code>"]
     end
 
     subgraph "Internal Network A (10.10.10.0/24)"
-        P1["<b>Pivot 1</b><br/>Iface 1: 172.28.0.10<br/>Iface 2: 10.10.10.10"]
+        P1["<b>Pivot 1</b><br/>172.28.0.10 / 10.10.10.10<br/><hr/><code>chisel client 172.28.0.5:10000 R:1080:socks</code>"]
     end
 
     subgraph "Internal Network B (10.10.20.0/24)"
-        P2["<b>Pivot 2</b><br/>Iface 1: 10.10.10.20<br/>Iface 2: 10.10.20.10<br/><hr/><i>Chisel Server :10001</i>"]
+        P2["<b>Pivot 2</b><br/>10.10.10.20 / 10.10.20.10<br/><hr/><code>chisel server -p 10001 --socks5 --reverse</code>"]
     end
 
     A <== "<b>Tunnel 1</b><br/>R:1080:socks" ==> P1
@@ -163,19 +163,19 @@ In this scenario, we pivot through all three nodes to reach the `10.10.30.0/24` 
 %%{init: {'themeVariables': { 'primaryTextColor': '#000', 'secondaryTextColor': '#000', 'tertiaryTextColor': '#000' }}}%%
 graph LR
     subgraph "External Network (172.28.0.0/24)"
-        A["<b>Attacker</b><br/>172.28.0.5<br/><hr/><i>Chisel Server :10000</i><br/><i>Chisel Client (to P2)</i><br/><i>Chisel Client (to P3)</i>"]
+        A["<b>Attacker</b><br/>172.28.0.5<br/><hr/><code>chisel server -p 10000 --reverse</code><br/><code>chisel client --proxy socks://127.0.0.1:1080 10.10.10.20:10001 1081:socks</code><br/><code>chisel client --proxy socks://127.0.0.1:1081 10.10.20.20:10002 1082:socks</code>"]
     end
 
     subgraph "Internal Network A (10.10.10.0/24)"
-        P1["<b>Pivot 1</b><br/>Iface 1: 172.28.0.10<br/>Iface 2: 10.10.10.10"]
+        P1["<b>Pivot 1</b><br/>172.28.0.10 / 10.10.10.10<br/><hr/><code>chisel client 172.28.0.5:10000 R:1080:socks</code>"]
     end
 
     subgraph "Internal Network B (10.10.20.0/24)"
-        P2["<b>Pivot 2</b><br/>Iface 1: 10.10.10.20<br/>Iface 2: 10.10.20.10<br/><hr/><i>Chisel Server :10001</i>"]
+        P2["<b>Pivot 2</b><br/>10.10.10.20 / 10.10.20.10<br/><hr/><code>chisel server -p 10001 --socks5 --reverse</code>"]
     end
 
     subgraph "Deep Internal Network (10.10.30.0/24)"
-        P3["<b>Pivot 3</b><br/>Iface 1: 10.10.20.20<br/>Iface 2: 10.10.30.10<br/><hr/><i>Chisel Server :10002</i>"]
+        P3["<b>Pivot 3</b><br/>10.10.20.20 / 10.10.30.10<br/><hr/><code>chisel server -p 10002 --socks5 --reverse</code>"]
     end
 
     A <== "<b>Tunnel 1</b><br/>R:1080:socks" ==> P1
@@ -236,11 +236,11 @@ In this scenario, we forward port 3000 from the **Attacker** to **Pivot 1**.
 %%{init: {'themeVariables': { 'primaryTextColor': '#000', 'secondaryTextColor': '#000', 'tertiaryTextColor': '#000' }}}%%
 graph LR
     subgraph "External Network (172.28.0.0/24)"
-        A["<b>Attacker</b><br/>172.28.0.5<br/><hr/><i>Chisel Server :10000</i><br/><i>HTTP Server :3000</i>"]
+        A["<b>Attacker</b><br/>172.28.0.5<br/><hr/><code>chisel server -p 10000 --reverse</code><br/><i>HTTP Server :3000</i>"]
     end
 
     subgraph "Internal Network A (10.10.10.0/24)"
-        P1["<b>Pivot 1</b><br/>Iface 1: 172.28.0.10<br/>Iface 2: 10.10.10.10"]
+        P1["<b>Pivot 1</b><br/>172.28.0.10 / 10.10.10.10<br/><hr/><code>chisel client 172.28.0.5:10000 3000:127.0.0.1:3000</code>"]
     end
 
     A <== "<b>Tunnel 1</b>" ==> P1
@@ -277,15 +277,15 @@ In this scenario, we forward port 3000 from the **Attacker** through two hops to
 %%{init: {'themeVariables': { 'primaryTextColor': '#000', 'secondaryTextColor': '#000', 'tertiaryTextColor': '#000' }}}%%
 graph LR
     subgraph "External Network (172.28.0.0/24)"
-        A["<b>Attacker</b><br/>172.28.0.5<br/><hr/><i>Server :10000</i><br/><i>HTTP :3000</i><br/><i>Client (to P2)</i>"]
+        A["<b>Attacker</b><br/>172.28.0.5<br/><hr/><code>chisel server -p 10000 --reverse</code><br/><i>HTTP :3000</i><br/><code>chisel client --proxy socks://127.0.0.1:1080 10.10.10.20:10001 R:3000:127.0.0.1:3000</code>"]
     end
 
     subgraph "Internal Network A (10.10.10.0/24)"
-        P1["<b>Pivot 1</b><br/>Iface 1: 172.28.0.10<br/>Iface 2: 10.10.10.10"]
+        P1["<b>Pivot 1</b><br/>172.28.0.10 / 10.10.10.10<br/><hr/><code>chisel client 172.28.0.5:10000 R:1080:socks</code>"]
     end
 
     subgraph "Internal Network B (10.10.20.0/24)"
-        P2["<b>Pivot 2</b><br/>Iface 1: 10.10.10.20<br/>Iface 2: 10.10.20.10<br/><hr/><i>Server :10001</i>"]
+        P2["<b>Pivot 2</b><br/>10.10.10.20 / 10.10.20.10<br/><hr/><code>chisel server -p 10001 --socks5 --reverse</code>"]
     end
 
     A <== "<b>Tunnel 1</b><br/>R:1080:socks" ==> P1
@@ -336,19 +336,19 @@ In this scenario, we forward port 3000 through three hops to **Pivot 3**.
 %%{init: {'themeVariables': { 'primaryTextColor': '#000', 'secondaryTextColor': '#000', 'tertiaryTextColor': '#000' }}}%%
 graph LR
     subgraph "External Network (172.28.0.0/24)"
-        A["<b>Attacker</b><br/>172.28.0.5<br/><hr/><i>Server :10000</i><br/><i>HTTP :3000</i><br/><i>Client (to P2)</i><br/><i>Client (to P3)</i>"]
+        A["<b>Attacker</b><br/>172.28.0.5<br/><hr/><code>chisel server -p 10000 --reverse</code><br/><i>HTTP :3000</i><br/><code>chisel client --proxy socks://127.0.0.1:1080 10.10.10.20:10001 1081:socks</code><br/><code>chisel client --proxy socks://127.0.0.1:1081 10.10.20.20:10002 R:3000:127.0.0.1:3000</code>"]
     end
 
     subgraph "Internal Network A (10.10.10.0/24)"
-        P1["<b>Pivot 1</b><br/>Iface 1: 172.28.0.10<br/>Iface 2: 10.10.10.10"]
+        P1["<b>Pivot 1</b><br/>172.28.0.10 / 10.10.10.10<br/><hr/><code>chisel client 172.28.0.5:10000 R:1080:socks</code>"]
     end
 
     subgraph "Internal Network B (10.10.20.0/24)"
-        P2["<b>Pivot 2</b><br/>Iface 1: 10.10.10.20<br/>Iface 2: 10.10.20.10<br/><hr/><i>Server :10001</i>"]
+        P2["<b>Pivot 2</b><br/>10.10.10.20 / 10.10.20.10<br/><hr/><code>chisel server -p 10001 --socks5 --reverse</code>"]
     end
 
     subgraph "Deep Internal Network (10.10.30.0/24)"
-        P3["<b>Pivot 3</b><br/>Iface 1: 10.10.20.20<br/>Iface 2: 10.10.30.10<br/><hr/><i>Server :10002</i>"]
+        P3["<b>Pivot 3</b><br/>10.10.20.20 / 10.10.30.10<br/><hr/><code>chisel server -p 10002 --socks5 --reverse</code>"]
     end
 
     A <== "<b>Tunnel 1</b>" ==> P1
