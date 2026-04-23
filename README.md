@@ -15,7 +15,6 @@
   - [Attacker - Pivot 1 - Pivot 2](#attacker---pivot-1---pivot-2-1)
   - [Attacker - Pivot 1 - Pivot 2 - Pivot 3](#attacker---pivot-1---pivot-2---pivot-3-1)
 
-
 ## Setup
 wget https://github.com/jpillora/chisel/releases/download/v1.11.5/chisel_1.11.5_linux_amd64.gz -O chisel.gz && gzip -d chisel.gz
 
@@ -402,3 +401,5 @@ wget -qO- http://127.0.0.1:3000
 ```
 
 ![](docs/fa-attacker-pivot_1-pivot_2-pivot_3.png)
+
+# Thanks @jpillora for [this awesome tool, chisel](https://github.com/jpillora/chisel)
