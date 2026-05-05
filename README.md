@@ -1,4 +1,4 @@
-# Pivoting with Chisel - Laboratory
+# Lab - Pivoting with Chisel
 
 ## Table of Contents
 - [Setup](#setup)
